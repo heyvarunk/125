@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Varun K - Dynamic Design Engineer Portfolio (SPA)</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Configure the Inter font for a professional look */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117; /* Dark background */
+            color: #c9d1d9; /* Light text */
+        }
+        /* Custom class for the glowing accent color */
+        .accent-glow {
+            color: #58a6ff;
+            text-shadow: 0 0 5px #58a6ff;
+        }
+        /* Style for the active/open section link */
+        .nav-link.active {
+            border-bottom: 2px solid #58a6ff;
+            color: #ffffff;
+        }
+        /* Custom scroll indicator for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #58a6ff;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0d1117;
+        }
+        /* Modal transitions */
+        .section-viewer, .project-modal {
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        /* Prevent body scroll when a viewer is open */
+        .no-scroll {
+            overflow: hidden;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'background': '#0d1117',
+                        'card-bg': '#161b22',
+                        'accent': '#58a6ff',
+                        'primary-text': '#c9d1d9',
+                    },
+                    keyframes: {
+                        'waving-hand': {
+                            '0%': { transform: 'rotate(0.0deg)' },
+                            '10%': { transform: 'rotate(14deg)' },
+                            '20%': { transform: 'rotate(-8deg)' },
+                            '30%': { transform: 'rotate(14deg)' },
+                            '40%': { transform: 'rotate(-4deg)' },
+                            '50%': { transform: 'rotate(10.0deg)' },
+                            '60%': { transform: 'rotate(0.0deg)' },
+                            '100%': { transform: 'rotate(0.0deg)' },
+                        },
+                    },
+                    animation: {
+                        'waving-hand': 'waving-hand 2.5s infinite',
+                    }
+                }
+            }
+        }
+
+        // --- PROJECT DATA SOURCE (Kept for detail modal) ---
+        const projectData = [
+            {
+                id: 1,
+                title: "Emergency Flotation System (EFS) for LUH",
+                client: "HAL, Bangalore",
+                duration: "Feb 2023 – Jul 2023",
+                tags: ["EFS Development", "FAR Part 27", "System Integration"],
+                details: `<p class="mb-4">Engineered a <strong>3000 kg Light Utility Helicopter</strong> with single-engine and skid-type landing gear. Defined Emergency Flotation System (EFS) specifications for occupant evacuation during water landings.</p><p class="mb-4">Conducted model testing aligned with <strong>FAR Part 27</strong> and <strong>MIL-STD</strong> airworthiness standards. Led EFS development with skid-mounted float packs and pressure vessels; delivered technical and commercial proposals.</p><p class="font-semibold text-accent mt-4">This project directly ensured high-stakes compliance and safety for crucial aerospace assets.</p>`
+            },
+            {
+                id: 2,
+                title: "Bend Restrictor for Underwater Cable",
+                client: "Defence Research and Development Organisation (DRDO)",
+                duration: "Jul 2022 – Mar 2023",
+                tags: ["Hybrid Materials", "Underwater Defense", "DRDO Project"],
+                details: `<p class="mb-4">Designed bend restrictors using <strong>hybrid materials</strong> for defense-grade underwater cable protection, focusing on maximizing service life under extreme marine pressure.</p><p class="mb-4">Directed system development methodologies to enhance technical performance in deployment and retrieval operations. Conducted in-depth research to resolve complex design and deployment challenges, ensuring long-term operational integrity.</p>`
+            },
+            {
+                id: 3,
+                title: "Aircraft Structural Design & Fatigue Analysis",
+                client: "Aerospace/Defense Sector",
+                duration: "N/A",
+                tags: ["CATIA V5", "Ansys", "Fatigue Life", "ASME Y14.5"],
+                details: `<p class="mb-4">Modeled fuselage and wing structures with meticulous attention to <strong>tolerance stack-up and GD&T principles</strong> (ASME Y14.5) to ensure manufacturing precision.</p><p class="mb-4">Simulated <strong>fatigue cycles</strong> and <strong>modal behavior</strong> for specialized aerospace-grade alloys under various load conditions, validating structural integrity beyond expected service life.</p><p class="font-semibold text-accent mt-4">Tools: CATIA V5, Ansys | Standard: ASME Y14.5</p>`
+            },
+            {
+                id: 4,
+                title: "Crash Simulation & Vibration Analysis for EV Chassis",
+                client: "Automotive Sector",
+                duration: "N/A",
+                tags: ["FEA", "SPC", "Weight Reduction", "ISO/TS 16949"],
+                details: `<p class="mb-4">Simulated crash scenarios (front, side, roll-over) and complex vibration profiles for electric vehicle platforms, crucial for <strong>battery integrity and occupant safety</strong>.</p><p class="mb-4">Successfully enhanced occupant safety and ensured compliance with <strong>ISO/TS 16949</strong> standards. Achieved tangible metrics: <ul><li>- <strong>10% weight reduction</strong> through topology optimization.</li><li>- <strong>15% increase in fatigue life</strong> of key structural components.</li><li>- <strong>92% predictive accuracy</strong> in failure zones, minimizing physical prototyping.</li></ul></p><p class="font-semibold text-accent mt-4">Tools: Ansys, Siemens NX | Methods: FEA, SPC</p>`
+            },
+            {
+                id: 5,
+                title: "Powertrain Optimization for Defense Marine Platforms",
+                client: "Naval/Defense Systems",
+                duration: "N/A",
+                tags: ["Digital Twin", "12% Efficiency Boost", "FEA/CFD"],
+                details: `<p class="mb-4">Redesigned gear and transmission systems for <strong>high-load naval vehicles</strong>, focusing on durability and minimizing acoustic signature for stealth capabilities.</p><p class="mb-4">Validated structural and thermal performance using <strong>FEA and CFD simulations</strong>. Integrated a <strong>digital twin methodology</strong> for predictive maintenance and real-time diagnostics, resulting in a <strong>12% boost in drivetrain efficiency</strong> and significantly reduced field failure rates.</p><p class="font-semibold text-accent mt-4">Collaborated directly with naval teams to meet stringent stealth and acoustic constraints.</p>`
+            },
+            {
+                id: 6,
+                title: "Reverse Engineering & Additive Manufacturing",
+                client: "HAL and DRDO",
+                duration: "N/A",
+                tags: ["3D Printing", "SolidWorks", "AS9100", "Reverse Engineering"],
+                details: `<p class="mb-4">Reconstructed legacy aerospace components, which lacked modern CAD data, using advanced <strong>reverse engineering and 3D scanning techniques</strong>.</p><p class="mb-4">Produced lightweight, complex prototypes via <strong>additive manufacturing</strong> for both HAL and DRDO, accelerating the product development lifecycle while strictly adhering to <strong>AS9100 and IPC-2570</strong> quality standards.</p><p class="font-semibold text-accent mt-4">Tools: SolidWorks, Creo, 3D Printing</p>`
+            },
+            {
+                id: 7,
+                title: "Structural Validation of Sonar Deployment Mechanism",
+                client: "Underwater Surveillance Platforms",
+                duration: "N/A",
+                tags: ["FEA Validation", "HyperMesh", "Marine Conditions", "18% Reliability"],
+                details: `<p class="mb-4">Supported <strong>FEA validation</strong> of sonar deployment arms for underwater surveillance platforms, ensuring operational integrity in challenging environments.</p><p class="mb-4">Modeled composite structures to withstand <strong>hydrostatic pressure and dynamic loads</strong>. Delivered simulation insights for optimized material selection and mechanical tolerances. The analysis resulted in an <strong>18% improvement in system reliability</strong> in simulated stress environments.</p><p class="font-semibold text-accent mt-4">Role: Simulation & Validation Contributor | Tools: SolidWorks, ANSYS, HyperMesh</p>`
+            }
+        ];
+
+        // Global state for tracking the active section
+        let activeSectionId = null;
+
+        // --- Helper: Get Content HTML for a Section ID ---
+        function getSectionContent(sectionId) {
+            switch(sectionId) {
+                case 'about':
+                    return {
+                        title: "About My Expertise",
+                        content: `
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 items-start">
+                                <div class="md:col-span-2 text-lg space-y-6">
+                                    <p>My career has been defined by applying advanced mechanical analysis and design principles across highly demanding sectors, including <strong class="font-semibold">aerospace, automotive, and defense (DRDO, HAL)</strong>. I specialize in the full product lifecycle, from initial concept CAD modeling (ASME Y14.5) to final performance validation using FEA and CFD.</p>
+                                    <p>In my recent roles, I focused on high-compliance systems for major defense and PSU clients. Prior to this, my role at <strong class="font-semibold">DRDO</strong> involved direct contributions to powertrain module redesign and structural optimization for defense-grade vehicles. My recent focus has been on integrating <strong>Artificial Intelligence and Machine Learning</strong> into design processes to achieve unprecedented optimization speeds.</p>
+                                    <p class="font-semibold accent-glow">I hold a B.Tech in Mechanical Engineering and have specialized certifications from MIT and IIT, underlining my commitment to continuous learning and technical excellence.</p>
+                                </div>
+                                <div class="md:col-span-1 p-6 bg-card-bg rounded-xl shadow-xl border border-accent/20">
+                                    <h3 class="text-2xl font-semibold mb-4 text-white">Quick Facts</h3>
+                                    <ul class="space-y-3 text-primary-text">
+                                        <li class="flex justify-between border-b border-gray-700 pb-2"><span class="font-medium">Current Role:</span><span>Senior Design Engineer</span></li>
+                                        <li class="flex justify-between border-b border-gray-700 pb-2"><span class="font-medium">Experience:</span><span>3+ Years</span></li>
+                                        <li class="flex justify-between border-b border-gray-700 pb-2"><span class="font-medium">Education:</span><span>B.Tech & IIT-G AI/ML</span></li>
+                                        <li class="flex justify-between pb-2"><span class="font-medium">Metric Driven:</span><span class="accent-glow">45% Performance Gain Record</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        `
+                    };
+                case 'projects':
+                    return {
+                        title: "Key Achievements & Projects",
+                        content: `
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                ${projectData.map(p => `
+                                    <div class="bg-card-bg p-6 rounded-xl shadow-xl border border-accent/20 hover:border-accent transition duration-300 transform hover:-translate-y-1 cursor-pointer" onclick="openProjectDetails(${p.id})">
+                                        <div class="h-16 bg-gray-800 rounded-lg mb-4 flex items-center justify-center text-gray-500 text-sm">${p.client}</div>
+                                        <h3 class="text-xl font-semibold text-white mb-2">${p.title}</h3>
+                                        <p class="text-primary-text mb-4 text-sm">${p.title.includes('EFS') ? 'Led the design and development of the EFS for the 3000 Kg Light Utility Helicopter. Ensured full airworthiness compliance.' : p.title.includes('Bend Restrictor') ? 'Designed bend restrictors using hybrid materials for defense-grade underwater cable protection.' : 'Click for details...'}</p>
+                                        <div class="flex flex-wrap space-x-2 text-xs">
+                                            ${p.tags.slice(0, 2).map(tag => `<span class="px-2 py-1 bg-accent/20 rounded-full text-accent">${tag}</span>`).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `
+                    };
+                case 'certifications':
+                    return {
+                        title: "Key Certifications & Advanced Studies",
+                        content: `
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                                <div class="bg-card-bg p-6 rounded-xl shadow-xl border border-card-bg hover:border-green-500/40 transition duration-300">
+                                    <h3 class="text-2xl font-semibold text-white mb-2">Design of Medical Devices and Implants</h3>
+                                    <p class="text-lg accent-glow mb-4">Massachusetts Institute of Technology (MIT)</p>
+                                    <p class="text-sm text-primary-text">Focuses on advanced materials, biomechanics, regulatory compliance (FDA/CE), and the design lifecycle of critical medical hardware, enhancing expertise in bio-engineering fields.</p>
+                                    <p class="text-xs mt-4 text-gray-500"></p>
+                                </div>
+                                <div class="bg-card-bg p-6 rounded-xl shadow-xl border border-card-bg hover:border-red-500/40 transition duration-300">
+                                    <h3 class="text-2xl font-semibold text-white mb-2">AI and Machine Learning for Engineering Design</h3>
+                                    <p class="text-lg accent-glow mb-4">Massachusetts Institute of Technology (MIT)</p>
+                                    <p class="text-sm text-primary-text">Covers utilizing deep learning, optimization algorithms, and predictive modeling (<strong>AI/ML</strong>) to automate design validation and optimize product architectures for speed and efficiency.</p>
+                                    <p class="text-xs mt-4 text-gray-500"></p>
+                                </div>
+                            </div>
+                        `
+                    };
+                case 'skills':
+                    return {
+                        title: "Technical Skills",
+                        content: `
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                                <div class="bg-card-bg p-6 rounded-xl shadow-md border border-card-bg hover:border-accent/40 transition duration-300">
+                                    <div class="text-5xl mb-3 block accent-glow mx-auto w-12 h-12"><svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto"><path d="M12 20h.01"/><path d="M12 16h.01"/><path d="M12 12h.01"/><path d="M12 8h.01"/><path d="M12 4h.01"/><path d="M16 20h.01"/><path d="M16 4h.01"/><path d="M8 20h.01"/><path d="M8 4h.01"/><rect width="20" height="4" x="2" y="2" rx="1"/><rect width="20" height="4" x="2" y="18" rx="1"/><path d="M2 7h20"/><path d="M2 17h20"/></svg></div>
+                                    <h3 class="text-xl font-semibold text-white">CAD & Modeling</h3>
+                                    <p class="text-sm text-primary-text mt-1">SolidWorks, CATIA V5, Siemens NX, Creo, AutoCAD, GD&T (ASME Y14.5)</p>
+                                </div>
+                                <div class="bg-card-bg p-6 rounded-xl shadow-md border border-card-bg hover:border-accent/40 transition duration-300">
+                                    <div class="text-5xl mb-3 block accent-glow mx-auto w-12 h-12"><svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto"><path d="M14 12V3h-2l-3 8h2l-3 8h2l-3 3h8l-2-6h3"/></svg></div>
+                                    <h3 class="text-xl font-semibold text-white">Analysis, AI & FEA</h3>
+                                    <p class="text-sm text-primary-text mt-1">Ansys, FEA, CFD, Crash Simulation, Modal & Fatigue, <strong>AI/ML Integration</strong>, Thermal Stress</p>
+                                </div>
+                                <div class="bg-card-bg p-6 rounded-xl shadow-md border border-card-bg hover:border-accent/40 transition duration-300">
+                                    <div class="text-5xl mb-3 block accent-glow mx-auto w-12 h-12"><svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="m2 12h2"/><path d="m20 12h2"/><path d="m4.93 19.07 1.41-1.41"/><path d="m17.66 6.34 1.41-1.41"/></svg></div>
+                                    <h3 class="text-xl font-semibold text-white">Manufacturing & Process</h3>
+                                    <p class="text-sm text-primary-text mt-1">DFM, Injection Molding, Additive Manufacturing, Reverse Engineering, Lean, Six Sigma</p>
+                                </div>
+                                <div class="bg-card-bg p-6 rounded-xl shadow-md border border-card-bg hover:border-accent/40 transition duration-300">
+                                    <div class="text-5xl mb-3 block accent-glow mx-auto w-12 h-12"><svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto"><path d="M20 13c0 5-6 9-8 9s-8-4-8-9V5l8-3 8 3v8z"/><path d="m9 12 2 2 4-4"/></svg></div>
+                                    <h3 class="text-xl font-semibold text-white">Management & Compliance</h3>
+                                    <p class="text-sm text-primary-text mt-1">PLM, BOM Management, ISO 9001/TS 16949, IEC 61439, Agile/Scrum, NPD</p>
+                                </div>
+                            </div>
+                        `
+                    };
+                case 'contact':
+                    return {
+                        title: "Get In Touch",
+                        content: `
+                            <p class="text-xl text-primary-text mb-12 text-center max-w-2xl mx-auto">
+                                Ready to discuss new projects in design optimization, aerospace, or automotive engineering. Feel free to reach out. (External links disabled in this environment)
+                            </p>
+                            <div class="max-w-lg mx-auto p-8 bg-card-bg rounded-xl shadow-2xl border border-accent/30">
+                                <div class="flex justify-center space-x-6 mb-8">
+                                    <!-- LinkedIn link removed -->
+                                    <a href="#" class="text-primary-text hover:text-accent transition duration-200" aria-label="LinkedIn Profile">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" class="fill-current"><path d="M20.447 20.452h-3.856v-6.046c0-1.428-.507-2.394-1.78-2.394-.969 0-1.547.653-1.808 1.285-.091.22-.112.522-.112.822v6.333h-3.856s.05-10.428 0-11.458h3.856v1.758c.036.066.088.169.175.311h.022c.624-1.16 2.164-1.956 4.417-1.956 3.228 0 5.66 2.08 5.66 6.57v7.715zM4.337 8.019c-1.35 0-2.203-.895-2.203-2.025.022-1.15.875-2.025 2.203-2.025 1.328 0 2.203.875 2.203 2.025 0 1.13-.875 2.025-2.203 2.025zM2.433 20.452h3.856V9.006H2.433v11.446z"/></svg>
+                                    </a>
+                                    <!-- GitHub link removed -->
+                                    <a href="#" class="text-primary-text hover:text-accent transition duration-200" aria-label="GitHub Profile">
+                                         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" class="fill-current"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.6.11.821-.26.821-.575 0-.285-.011-1.04-.017-2.04-3.337.724-4.042-1.61-4.042-1.61-.546-1.385-1.332-1.75-1.332-1.75-1.087-.745.083-.73.083-.73 1.205.085 1.838 1.237 1.838 1.237 1.07 1.835 2.793 1.304 3.468.998.108-.77.419-1.304.762-1.604-2.659-.304-5.464-1.334-5.464-5.93 0-1.31.465-2.383 1.235-3.22-.12-.304-.539-1.523.114-3.18 0 0 1-.325 3.284 1.23s2.28 1.832 3.475 1.824c1.196 0 2.47-1.228 3.475-1.824 2.284-1.555 3.284-1.23 3.284-1.23.653 1.657.234 2.876.114 3.18.77.837 1.235 1.91 1.235 3.22 0 4.606-2.807 5.624-5.474 5.923.43.372.821 1.102.821 2.222 0 1.606-.015 2.899-.015 3.297 0 .318.216.69.826.575C20.565 21.801 24 17.306 24 12c0-6.627-5.373-12-12-12z"/></svg>
+                                    </a>
+                                    <!-- Email link removed -->
+                                    <a href="#" class="text-primary-text hover:text-accent transition duration-200" aria-label="Send Email">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                                    </a>
+                                    <!-- Phone link removed -->
+                                    <a href="#" class="text-primary-text hover:text-accent transition duration-200" aria-label="Call Phone Number">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 3.08 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                                    </a>
+                                </div>
+                                <form action="#" method="POST" class="space-y-6">
+                                    <div><label for="name" class="block text-sm font-medium text-primary-text mb-1">Name</label><input type="text" id="name" name="name" required class="w-full px-4 py-2 bg-background border border-gray-700 rounded-lg focus:border-accent focus:ring-accent outline-none transition duration-200"></div>
+                                    <div><label for="email" class="block text-sm font-medium text-primary-text mb-1">Email</label><input type="email" id="email" name="email" required class="w-full px-4 py-2 bg-background border border-gray-700 rounded-lg focus:border-accent focus:ring-accent outline-none transition duration-200"></div>
+                                    <div><label for="message" class="block text-sm font-medium text-primary-text mb-1">Message</label><textarea id="message" name="message" rows="4" required class="w-full px-4 py-2 bg-background border border-gray-700 rounded-lg focus:border-accent focus:ring-accent outline-none transition duration-200"></textarea></div>
+                                    <button type="submit" class="w-full py-3 bg-accent text-background font-bold rounded-lg shadow-lg hover:bg-blue-600 transition duration-300 transform hover:scale-[1.01]">Send Message</button>
+                                </form>
+                            </div>
+                        `
+                    };
+                default:
+                    return { title: "Error", content: "<p class='text-red-500'>Section not found.</p>" };
+            }
+        }
+
+        // --- Core Modal Logic: Opens the main Section Viewer ---
+        function openSectionViewer(sectionId) {
+            const sectionViewer = document.getElementById('sectionViewer');
+            const viewerContent = document.getElementById('viewerContent');
+            const content = getSectionContent(sectionId);
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            // 1. Update Navigation Active State
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('data-section') === sectionId) {
+                    link.classList.add('active');
+                }
+            });
+            activeSectionId = sectionId;
+
+            // 2. Populate Modal Content
+            viewerContent.innerHTML = `
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                    <h2 class="text-4xl md:text-5xl font-bold text-white mb-12 text-center">${content.title}</h2>
+                    ${content.content}
+                </div>
+            `;
+            
+            // 3. Display the Modal
+            sectionViewer.classList.remove('opacity-0', 'invisible');
+            sectionViewer.classList.add('opacity-100', 'visible');
+            document.body.classList.add('no-scroll');
+            window.scrollTo(0, 0); // Reset scroll to top of the viewer
+
+            // 4. Update the Close Button's action to close the viewer
+            document.getElementById('closeViewerButton').onclick = closeSectionViewer;
+        }
+
+        // --- Core Modal Logic: Closes the main Section Viewer ---
+        function closeSectionViewer() {
+            const sectionViewer = document.getElementById('sectionViewer');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            sectionViewer.classList.remove('opacity-100', 'visible');
+            sectionViewer.classList.add('opacity-0', 'invisible');
+            document.body.classList.remove('no-scroll');
+            activeSectionId = null;
+
+            // Clear active state from all links
+            navLinks.forEach(link => link.classList.remove('active'));
+        }
+        
+        // --- Nested Modal Logic: Opens the Project Details (called from within 'Projects' section) ---
+        function openProjectDetails(projectId) {
+            const project = projectData.find(p => p.id === projectId);
+            const modal = document.getElementById('projectModal');
+            const content = document.getElementById('modalContent');
+
+            if (!project) return;
+
+            content.querySelector('#modalTitle').innerHTML = project.title;
+            content.querySelector('#modalClient').textContent = project.client;
+            content.querySelector('#modalDuration').textContent = project.duration === "N/A" ? "Ongoing / Not Specified" : project.duration;
+            content.querySelector('#modalDetails').innerHTML = project.details;
+
+            const tagsContainer = content.querySelector('#modalTags');
+            tagsContainer.innerHTML = project.tags.map(tag => 
+                `<span class="px-3 py-1 bg-accent/20 text-accent font-medium rounded-full text-sm">${tag}</span>`
+            ).join('');
+
+            modal.classList.remove('opacity-0', 'invisible');
+            modal.classList.add('opacity-100', 'visible');
+            document.body.classList.add('no-scroll');
+        }
+
+        // --- Nested Modal Logic: Closes the Project Details ---
+        function closeProjectDetails() {
+            const modal = document.getElementById('projectModal');
+            modal.classList.remove('opacity-100', 'visible');
+            modal.classList.add('opacity-0', 'invisible');
+            // Ensure we keep the main viewer open if it was open
+            if (activeSectionId) {
+                 document.body.classList.add('no-scroll');
+            } else {
+                 document.body.classList.remove('no-scroll');
+            }
+        }
+    </script>
+</head>
+<body class="antialiased">
+
+    <!-- Navigation Bar -->
+    <header id="navbar" class="sticky top-0 z-50 bg-background/95 backdrop-blur-sm shadow-lg border-b border-card-bg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
+            <!-- Logo: Closes the viewer and returns to the hero -->
+            <a href="#hero" onclick="closeSectionViewer()" class="text-2xl font-extrabold accent-glow hover:text-white transition duration-200">
+                VK
+            </a>
+            
+            <!-- Desktop Navigation - NOW USES ONCLICK HANDLERS -->
+            <nav class="hidden md:flex space-x-8">
+                <button onclick="openSectionViewer('about')" data-section="about" class="nav-link text-primary-text hover:text-accent py-5 transition duration-200">About</button>
+                <button onclick="openSectionViewer('projects')" data-section="projects" class="nav-link text-primary-text hover:text-accent py-5 transition duration-200">Projects</button>
+                <button onclick="openSectionViewer('certifications')" data-section="certifications" class="nav-link text-primary-text hover:text-accent py-5 transition duration-200">Certifications</button>
+                <button onclick="openSectionViewer('skills')" data-section="skills" class="nav-link text-primary-text hover:text-accent py-5 transition duration-200">Skills</button>
+                <button onclick="openSectionViewer('contact')" data-section="contact" class="nav-link text-primary-text hover:text-accent py-5 transition duration-200">Contact</button>
+            </nav>
+
+            <div class="md:hidden">
+                <!-- Mobile menu button placeholder -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content (Only Hero and Footer are directly visible) -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+        <!-- Hero Section (Remains the static landing page) -->
+        <section id="hero" class="pt-20 md:pt-32 pb-24 flex flex-col md:flex-row items-center space-y-8 md:space-y-0 md:space-x-12 min-h-screen">
+            <div class="md:w-3/5 text-center md:text-left">
+                <p class="text-xl md:text-2xl mb-2 text-primary-text">
+                    Hello there <span class="inline-block animate-waving-hand">👋</span> I'm,
+                </p>
+                <h1 class="text-5xl sm:text-7xl lg:text-8xl font-black mb-4 text-white">
+                    Varun 
+                </h1>
+                <h2 class="text-2xl sm:text-3xl lg:text-4xl font-light accent-glow mb-8">
+                    Dynamic Design Engineer & Product Optimization Specialist
+                </h2>
+                <p class="text-lg md:text-xl text-primary-text max-w-2xl mx-auto md:mx-0 mb-10">
+With <strong class="font-semibold">3+ years of specialized experience</strong> across aerospace, automotive, and industrial systems, I engineer high-performance, regulation-compliant products using advanced <strong class="font-semibold">CAD, FEA, AI/ML, and Digital Twin methodologies</strong>—backed by a proven <strong class="font-semibold">45% product performance improvement</strong> record. <strong class="font-semibold">I bring 6+ years of hands-on leadership in family business operations and strategic communication</strong>, blending technical precision with business acumen. As the founder of <strong class="font-semibold">Varun Dynamics Pvt Ltd</strong>, I lead multidisciplinary teams to deliver cutting-edge engineering solutions, drive client success, and scale innovation across industries.
+                </p>
+                <div class="space-x-4">
+                    <!-- Button actions updated to open the respective sections -->
+                    <button onclick="openSectionViewer('contact')" class="inline-block px-8 py-3 bg-accent text-background font-bold rounded-lg shadow-lg hover:bg-blue-600 transition duration-300 transform hover:scale-105">
+                        Get In Touch
+                    </button>
+                    <button onclick="openSectionViewer('projects')" class="inline-block px-8 py-3 border border-primary-text text-primary-text font-semibold rounded-lg hover:border-accent hover:text-accent transition duration-300">
+                        View Work
+                    </button>
+                </div>
+            </div>
+            
+            <div class="md:w-2/5 flex justify-center">
+                <!-- PROFILE PHOTO ADDED HERE -->
+                <img id="profilePhoto" 
+                     src="https://raw.githubusercontent.com/heyvarunk/124/main/gate%20photo.jpg" 
+                     alt="Varun  Professional Profile Photo" 
+                     class="w-64 h-64 md:w-80 md:h-80 object-cover rounded-full border-4 border-accent shadow-2xl"
+                     onerror="this.onerror=null; this.src='https://placehold.co/320x320/161b22/58a6ff?text=VK';"
+                >
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-card-bg/50 py-8 border-t border-card-bg">
+        <div class="max-w-7xl mx-auto px-4 text-center text-sm text-primary-text">
+            <p>&copy; 2025 Varun K. All rights reserved. | Powered by Varundynamics Pvt Ltd.</p>
+        </div>
+    </footer>
+
+
+    <!-- --- PRIMARY SECTION VIEWER MODAL (The new "Tab" Container) --- -->
+    <div id="sectionViewer" class="section-viewer fixed inset-0 bg-background/95 backdrop-blur-sm z-[60] opacity-0 invisible overflow-y-auto">
+        <div class="min-h-full flex flex-col">
+            <!-- Close Button -->
+            <button id="closeViewerButton" onclick="closeSectionViewer()" class="fixed top-4 right-4 md:top-8 md:right-8 text-white hover:text-accent transition duration-200 p-2 rounded-full bg-card-bg/70 z-50 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+
+            <!-- Dynamic Content Area -->
+            <div id="viewerContent" class="flex-grow pt-16 pb-20">
+                <!-- Section content (About, Projects, Skills, etc.) will be injected here dynamically -->
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="w-full bg-card-bg/50 py-4 text-center border-t border-card-bg flex justify-center">
+                <button onclick="closeSectionViewer()" class="px-6 py-2 bg-accent text-background font-bold rounded-lg shadow-lg hover:bg-blue-600 transition duration-300 transform hover:scale-105">
+                    Back to Landing Page
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- --- SECONDARY PROJECT DETAIL MODAL (Nested Modal) --- -->
+    <div id="projectModal" class="project-modal fixed inset-0 bg-background/95 backdrop-blur-md z-[70] opacity-0 invisible overflow-y-auto">
+        <div class="max-w-4xl mx-auto p-4 md:p-8">
+            <!-- Close Button for Project Detail -->
+            <button onclick="closeProjectDetails()" class="absolute top-4 right-4 md:top-8 md:right-8 text-white hover:text-accent transition duration-200 p-2 rounded-full bg-card-bg/70 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+
+            <!-- Modal Content Area -->
+            <div id="modalContent" class="pt-16 pb-8">
+                <p class="text-xl md:text-2xl text-accent font-semibold mb-2" id="modalClient"></p>
+                <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6" id="modalTitle"></h1>
+                
+                <div class="flex flex-wrap items-center space-x-4 mb-8 text-primary-text">
+                    <span class="font-medium">Duration: <span id="modalDuration"></span></span>
+                </div>
+                
+                <!-- Tags -->
+                <div id="modalTags" class="flex flex-wrap gap-2 mb-10 border-b border-card-bg pb-6">
+                    <!-- Dynamic tags loaded here -->
+                </div>
+
+                <!-- Detailed Description -->
+                <div class="prose prose-invert max-w-none text-lg leading-relaxed space-y-4" id="modalDetails">
+                    <!-- Detailed project content loaded here -->
+                </div>
+            </div>
+
+            <!-- Footer for Modal -->
+            <div class="mt-12 text-center border-t border-card-bg pt-6">
+                <button onclick="closeProjectDetails()" class="px-8 py-3 bg-accent text-background font-bold rounded-lg shadow-lg hover:bg-blue-600 transition duration-300 transform hover:scale-105">
+                    Back to Projects
+                </button>
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>
+
+
+
