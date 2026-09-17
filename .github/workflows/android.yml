@@ -18,7 +18,7 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    # Isolated Gradle runtime setup
+    # Isolated clean Gradle build pipeline container configuration
     - name: Setup Gradle Runtime environment
       uses: gradle/actions/setup-gradle@v4
       with:
@@ -29,12 +29,16 @@ jobs:
         mkdir -p app/src/main/java/com/example/myapp
         mkdir -p app/src/main/res/layout
         
-        # 1. Create Manifest Permissions
+        # 1. Create Manifest Permissions (Strict Android 14+ standalone syntax rules)
         cat << 'EOF' > app/src/main/AndroidManifest.xml
-        <manifest xmlns:android="http://android.com" package="com.example.myapp">
+        <manifest xmlns:android="http://android.com">
             <uses-permission android:name="android.permission.INTERNET" />
-            <application android:label="Varun ERP" android:theme="@android:style/Theme.Material.Light.NoActionBar">
-                <activity android:name=".MainActivity" android:exported="true">
+            <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+            <application 
+                android:label="Varun ERP" 
+                android:hardwareAccelerated="true"
+                android:theme="@android:style/Theme.Material.Light.NoActionBar">
+                <activity android:name="com.example.myapp.MainActivity" android:exported="true" android:configChanges="orientation|screenSize">
                     <intent-filter>
                         <action android:name="android.intent.action.MAIN" />
                         <category android:name="android.intent.category.LAUNCHER" />
@@ -44,20 +48,21 @@ jobs:
         </manifest>
         EOF
 
-        # 2. Create Layout View
+        # 2. Create Layout View Frame
         cat << 'EOF' > app/src/main/res/layout/activity_main.xml
         <RelativeLayout xmlns:android="http://android.com" android:layout_width="match_parent" android:layout_height="match_parent">
             <WebView android:id="@+id/webview" android:layout_width="match_parent" android:layout_height="match_parent" />
         </RelativeLayout>
         EOF
 
-        # 3. Create Main Java Logic File with Embedded Web URL
+        # 3. Create Main Java Logic File pointing to your deployed site URL
         cat << 'EOF' > app/src/main/java/com/example/myapp/MainActivity.java
         package com.example.myapp;
         import android.os.Bundle;
         import android.webkit.WebSettings;
         import android.webkit.WebView;
         import android.webkit.WebViewClient;
+        import android.webkit.WebChromeClient;
         import android.app.Activity;
 
         public class MainActivity extends Activity {
@@ -67,13 +72,23 @@ jobs:
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.activity_main);
                 myWebView = (WebView) findViewById(R.id.webview);
-                WebSettings webSettings = myWebView.getSettings();
-                webSettings.setJavaScriptEnabled(true);
-                webSettings.setDomStorageEnabled(true);
-                myWebView.setWebViewClient(new WebViewClient());
                 
-                // Embedded Deployed Application URL
-                myWebView.loadUrl("https://heyvarunk.github.io/1256/");
+                WebSettings settings = myWebView.getSettings();
+                settings.setJavaScriptEnabled(true);
+                settings.setDomStorageEnabled(true);
+                settings.setDatabaseEnabled(true);
+                settings.setAllowFileAccess(true);
+                settings.setLoadsImagesAutomatically(true);
+                settings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
+                
+                settings.setUseWideViewPort(true);
+                settings.setLoadWithOverviewMode(true);
+                
+                myWebView.setWebViewClient(new WebViewClient());
+                myWebView.setWebChromeClient(new WebChromeClient());
+                
+                // Embedded Deployed Application Public Link
+                myWebView.loadUrl("https://github.io");
             }
             @Override
             public void onBackPressed() {
@@ -82,7 +97,7 @@ jobs:
         }
         EOF
 
-        # 4. Create Standard Gradle Configuration Files
+        # 4. Create Standard Build Gradle Settings assets
         echo "include ':app'" > settings.gradle
         
         cat << 'EOF' > build.gradle
